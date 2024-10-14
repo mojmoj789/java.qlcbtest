@@ -1,0 +1,199 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package qlcb;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+/**
+ *
+ * @author Admin
+ */
+public class GUIinsertCB extends javax.swing.JFrame {
+    
+    ublic class QLCB_GUI extends JFrame {
+    
+    private static Connection cn;
+    private JTextField txtSoTK, txtHoten, txtGT, txtDiachi, txtLuong;
+    private JTable table;
+    private DefaultTableModel tableModel;
+
+    public QLCB_GUI() {
+        // Thiết lập giao diện
+        setTitle("Quản lý Cán Bộ");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        // Tạo bảng
+        tableModel = new DefaultTableModel(new String[]{"SoTK", "Hoten", "GT", "Diachi", "Luong"}, 0);
+        table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        
+        // Tạo panel để nhập dữ liệu
+        JPanel inputPanel = new JPanel(new GridLayout(6, 2));
+        inputPanel.add(new JLabel("Số Tài Khoản:"));
+        txtSoTK = new JTextField();
+        inputPanel.add(txtSoTK);
+        
+        inputPanel.add(new JLabel("Họ Tên:"));
+        txtHoten = new JTextField();
+        inputPanel.add(txtHoten);
+        
+        inputPanel.add(new JLabel("Giới Tính:"));
+        txtGT = new JTextField();
+        inputPanel.add(txtGT);
+        
+        inputPanel.add(new JLabel("Địa Chỉ:"));
+        txtDiachi = new JTextField();
+        inputPanel.add(txtDiachi);
+        
+        inputPanel.add(new JLabel("Lương:"));
+        txtLuong = new JTextField();
+        inputPanel.add(txtLuong);
+        
+        JButton btnInsert = new JButton("Thêm Cán Bộ");
+        btnInsert.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int SoTK = Integer.parseInt(txtSoTK.getText());
+                String Hoten = txtHoten.getText();
+                String GT = txtGT.getText();
+                String Diachi = txtDiachi.getText();
+                int Luong = Integer.parseInt(txtLuong.getText());
+                insertCB(SoTK, Hoten, GT, Diachi, Luong);
+                loadData(); // Tải lại dữ liệu sau khi thêm
+            }
+        });
+        
+        inputPanel.add(btnInsert);
+        
+        // Thêm bảng và panel nhập vào frame
+        add(scrollPane, BorderLayout.CENTER);
+        add(inputPanel, BorderLayout.SOUTH);
+        
+        // Kết nối tới cơ sở dữ liệu
+        getCon();
+        loadData();
+    }
+
+    public void getCon() {
+        try {
+            cn = DriverManager.getConnection("jdbc:sqlserver://DAT\\SQLSERVER;database=QLCB;user=sa;password=1;trustServerCertificate=true;");
+            System.out.println("Kết nối thành công");
+        } catch (SQLException e) {
+            System.out.println("Kết nối thất bại: " + e.getMessage());
+        }
+    }
+
+    public void loadData() {
+        // Xóa dữ liệu cũ
+        tableModel.setRowCount(0);
+        
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM tbCanBo");
+            while (rs.next()) {
+                int SoTK = rs.getInt("SoTK");
+                String Hoten = rs.getString("Hoten");
+                String GT = rs.getString("GT");
+                String Diachi = rs.getString("Diachi");
+                int Luong = rs.getInt("Luong");
+                tableModel.addRow(new Object[]{SoTK, Hoten, GT, Diachi, Luong});
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi tải dữ liệu: " + e.getMessage());
+        }
+    }
+
+    public void insertCB(int SoTK, String Hoten, String GT, String Diachi, int Luong) {
+        String sql = "INSERT INTO tbCanBo (SoTK, Hoten, GT, Diachi, Luong) VALUES (?, ?, ?, ?, ?)";
+    
+        try {
+            PreparedStatement ps = cn.prepareStatement(sql);
+            ps.setInt(1, SoTK);
+            ps.setString(2, Hoten);
+            ps.setString(3, GT);
+            ps.setString(4, Diachi);
+            ps.setInt(5, Luong);
+            
+            int rowsInserted = ps.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Thêm thành công!");
+            } else {
+                System.out.println("Thêm thất bại.");
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi thêm cán bộ: " + e.getMessage());
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        
+        SwingUtilities.invokeLater(() -> {
+            GUIinsertCB frame = new GUIinsertCB();
+            frame.setVisible(true);
+        });
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(GUIinsertCB.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(GUIinsertCB.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(GUIinsertCB.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(GUIinsertCB.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
+}
